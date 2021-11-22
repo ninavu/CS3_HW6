@@ -18,7 +18,7 @@ RedBlackTree::RedBlackTree(const RedBlackTree& rbt){
 
 void RedBlackTree::RotateLeft(RBTNode* node){
 	RBTNode* tmp = node->right;		// set a tmp node to the right of the grandparent
-	//node->right = tmp->left;		// tmp's left child now becomes the grandparent's right child
+	node->right = tmp->left;		// tmp's left child now becomes the grandparent's right child
 	
 	/*
 	if (node->right != nullptr){
@@ -29,18 +29,18 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 	if (node->parent == nullptr){		// if node is the root, tmp node becomes the new root
 		root = tmp;
 		tmp->parent = nullptr;
+		
+	} else if (node == node->parent->left){		// switch the 
+		node->parent->left = tmp;
 	}
 	
 	tmp->left = node;			
 	node->parent = tmp;
-	
-	
-	
 }
 
 void RedBlackTree::RotateRight(RBTNode* node){
 	RBTNode* tmp = node->left;		// a tmp node points to the middle value
-	//node->left = tmp->right;
+	node->left = tmp->right;
 	
 	/*
 	if (node->left != nullptr){
@@ -73,7 +73,6 @@ RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
 		}
 	}
 	
-	numItems++;
 	return r;
 } 
 
@@ -101,24 +100,36 @@ void RedBlackTree::Insert(int n){
 			uncle = grandparent->right;
 
 			if (uncle == nullptr) {
+				if (node == parent->right){
+					RotateLeft(parent);
+					node = parent;
+					parent = node->parent;
+				}
 				
 				RotateRight(grandparent);
 				grandparent->color = COLOR_RED;
 				parent->color = COLOR_BLACK;
 				cout << "grandparent color: " << RBTNodeToString(grandparent) << endl;
 				cout << "parent color: " << RBTNodeToString(parent) << endl;
-				cout << "node color: " << RBTNodeToString(node) << endl;
+				//cout << "node color: " << RBTNodeToString(node) << endl;
 				
 			}
 			
 		} else if (parent == grandparent->right) {
 			uncle = grandparent->left;
+			
+			if (uncle == nullptr) {
+				
+				RotateLeft(grandparent);
+				grandparent->color = COLOR_RED;
+				parent->color = COLOR_BLACK;
+			}
 		}
 	}
 	
 	root->color = COLOR_BLACK;				// make sure root node is black
 	AllNodes.push_back(node);
-	//cout << "root color: " << RBTNodeToString(root) << endl;
+	numItems++;
 	// if parent is red, check color of uncle (uncle = black (null) => rotate + recolor , uncle = red -> recolor
 }
 
@@ -194,8 +205,26 @@ string RedBlackTree::ToInfixString(RBTNode* node) const{
 	
 	if (node == nullptr){
 		return s;
+	}
+	
+	if (node->left != nullptr){
+		s += ToPrefixString(node->left);
+	} 
+	s += RBTNodeToString(node);
 		
-	} else {
+		
+	if (node->right != nullptr){
+		s += ToPrefixString(node->right);
+	}
+	
+	return s;
+}
+
+string RedBlackTree::ToPrefixString(RBTNode* node) const{
+	string s;
+	
+	if (node != nullptr){
+		
 		s += RBTNodeToString(node);
 		
 		if (node->left != nullptr){
@@ -206,28 +235,7 @@ string RedBlackTree::ToInfixString(RBTNode* node) const{
 			s += ToPrefixString(node->right);
 		}
 	}
-	
-	return s;
-}
 
-string RedBlackTree::ToPrefixString(RBTNode* node) const{
-	string s;
-
-	if (node == nullptr){
-		return s;
-		
-	} 
-	s += RBTNodeToString(node);
-	
-	if (node->left != nullptr){
-		s += ToPrefixString(node->left);
-	} 
-	
-	if (node->right != nullptr){
-		s += ToPrefixString(node->right);
-	}
-
-	
 	return s;
 }
 
@@ -236,17 +244,18 @@ string RedBlackTree::ToPostfixString(RBTNode* node) const{
 
 	if (numItems == 0){
 		return s;
-	} else {
-		s += RBTNodeToString(node);
-		
-		if (node->left != nullptr){
-			s += ToPrefixString(node->left);
-		} 
-		
-		if (node->right != nullptr){
-			s += ToPrefixString(node->right);
-		}
 	}
+	
+	if (node->left != nullptr){
+		s += ToPrefixString(node->left);
+	} 
+	
+	if (node->right != nullptr){
+		s += ToPrefixString(node->right);
+	}
+	
+	s += RBTNodeToString(node);
+
 	return s;
 }
 
