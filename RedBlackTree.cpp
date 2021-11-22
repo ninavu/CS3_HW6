@@ -259,10 +259,22 @@ string RedBlackTree::ToPostfixString(RBTNode* node) const{
 	return s;
 }
 
-RedBlackTree::~RedBlackTree(){
-	//RBTNode* tmp = root;
-	
-	for (unsigned int i = 0; i < AllNodes.size(); i++){
-		delete AllNodes.at(i);
+void RedBlackTree::DeleteNode(RBTNode* node){
+		
+	if (node != nullptr){
+		
+		if (node->left != nullptr){
+			DeleteNode(node->left);
+		} 
+		
+		if (node->right != nullptr){
+			DeleteNode(node->right);
+		}
+		
+		delete node;
 	}
+}
+
+RedBlackTree::~RedBlackTree(){
+	DeleteNode(root);
 }

@@ -43,6 +43,7 @@ class RedBlackTree {
 		RBTNode* InsertNode(RBTNode* r, RBTNode* n);
 		void RotateLeft(RBTNode* n);
 		void RotateRight(RBTNode* n);
+		void DeleteNode(RBTNode* n);
 		
 		unsigned long long int numItems;
 		RBTNode *root;	
