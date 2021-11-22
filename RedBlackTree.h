@@ -4,6 +4,7 @@
 #define COLOR_BLACK 1
 
 #include <iostream>	
+#include <vector>
 
 using namespace std;
 
@@ -45,6 +46,7 @@ class RedBlackTree {
 		
 		unsigned long long int numItems;
 		RBTNode *root;	
+		vector<RBTNode*> AllNodes;
 };
 
 
