@@ -4,13 +4,12 @@
 #define COLOR_BLACK 1
 
 #include <iostream>	
-#include <vector>
 
 using namespace std;
 
 struct RBTNode {
 	int data;
-	unsigned short int color = COLOR_RED;		// new node added will be red
+	unsigned short int color = COLOR_RED;		// new node added will always be red
 	RBTNode* parent = nullptr;
 	RBTNode* right = nullptr;
 	RBTNode* left = nullptr;		// null nodes are black
@@ -18,9 +17,9 @@ struct RBTNode {
 
 class RedBlackTree {
 	public:
-		RedBlackTree();  //simple constructor
+		RedBlackTree();  	//simple constructor
 		RedBlackTree(const RedBlackTree& rbt);			//copy constructor
-		~RedBlackTree();
+		~RedBlackTree();	// destructor
 		
 		void Insert(int num);
 		bool Contains(int num);
@@ -47,7 +46,6 @@ class RedBlackTree {
 		
 		unsigned long long int numItems;
 		RBTNode *root;	
-		vector<RBTNode*> AllNodes;
 };
 
 

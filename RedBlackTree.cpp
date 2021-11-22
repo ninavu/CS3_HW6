@@ -13,25 +13,37 @@ RedBlackTree::RedBlackTree(){
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& rbt){
-	// DO IT LAST
+	
+	while (root != nullptr){
+		root->data = rbt.root->data;
+		root->color = rbt.root->color;
+		
+		if (root->left != nullptr){
+			root = root->left;
+		}
+		
+		if (root->right != nullptr){
+			root = root->right;
+		}
+	}
+	
+	//RBTNode root_copy = *root;		// copy the color, data, left, child, parent
+	numItems = rbt.numItems;	
 }
 
 void RedBlackTree::RotateLeft(RBTNode* node){
-	RBTNode* tmp = node->right;		// set a tmp node to the right of the grandparent
-	node->right = tmp->left;		// tmp's left child now becomes the grandparent's right child
+	RBTNode* tmp = node->right;	
+	node->right = tmp->left;			// open a new slot on the left and remove pointer from node to tmp
 	
-	/*
-	if (node->right != nullptr){
-		node->right->parent = node;
-	}
-	*/
-
 	if (node->parent == nullptr){		// if node is the root, tmp node becomes the new root
 		root = tmp;
 		tmp->parent = nullptr;
 		
-	} else if (node == node->parent->left){		// switch the 
+	} else if (node == node->parent->left){		
 		node->parent->left = tmp;
+		
+	} else if (node == node->parent->right){		// switch the middle value with the parent
+		node->parent->right = tmp;
 	}
 	
 	tmp->left = node;			
@@ -40,22 +52,26 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 
 void RedBlackTree::RotateRight(RBTNode* node){
 	RBTNode* tmp = node->left;		// a tmp node points to the middle value
-	node->left = tmp->right;
-	
-	/*
-	if (node->left != nullptr){
-		node->left->parent = node;
-	} */
-	
+	node->left = tmp->right;		// open a new slot on the right and remove pointer from node to tmp
+
 	if (node->parent == nullptr){		// if node is the root, tmp node becomes the new root
 		root = tmp;
 		tmp->parent = nullptr;
+		
+	} else if (node == node->parent->right){		// switch the middle value with the parent
+		node->parent->right = tmp;
+		
+	} else if (node == node->parent->left){
+		node->parent->left = tmp;
 	}
 	
 	tmp->right = node;			
 	node->parent = tmp;
 }
 
+/* An Insert helper function that recursively calls itself 
+ * to add new nodes into the tree that match the properties of 
+ * a binary search tree */
 RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
 
 	if (r == nullptr){
@@ -81,17 +97,14 @@ void RedBlackTree::Insert(int n){
 	RBTNode* node = new RBTNode;
 	node->data = n;
 	
-	if (Contains(n)){	// BST doesn't allow duplicate numbers
+	if (Contains(n)){						// BST doesn't allow duplicate numbers
 		throw invalid_argument("Node already exists in the tree!");	
 	} 
 	
-	root = InsertNode(root, node);			// call a recursive function to keep adding nodes to the tree
+	root = InsertNode(root, node);			// call a recursive function on root to keep traversing the tree and adding new nodes
 	
-	// exit if the parent of the new node is black/null
-	
-	// make sure node is not the root to avoid segmentation fault
-	
-	while (node != root && node->parent->color == COLOR_RED){		// CHECK WHETHER CURRENT NODE IS RED TOO?
+	// exit if the parent of the new node is black/null, otherwise move on to the balancing steps
+	while (node != root && node->parent->color == COLOR_RED){		// make sure node is not the root to avoid segmentation fault
 		RBTNode* parent = node->parent;
 		RBTNode* grandparent = parent->parent;
 		RBTNode* uncle = new RBTNode;
@@ -99,38 +112,50 @@ void RedBlackTree::Insert(int n){
 		if (parent == grandparent->left){
 			uncle = grandparent->right;
 
-			if (uncle == nullptr) {
+			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
 				if (node == parent->right){
 					RotateLeft(parent);
-					node = parent;
+					node = parent;						// change pointers after rotating before going into another rotation
 					parent = node->parent;
 				}
 				
-				RotateRight(grandparent);
-				grandparent->color = COLOR_RED;
+				RotateRight(grandparent);				// rotate and recolor when uncle is black
+				grandparent->color = COLOR_RED;			
 				parent->color = COLOR_BLACK;
-				cout << "grandparent color: " << RBTNodeToString(grandparent) << endl;
-				cout << "parent color: " << RBTNodeToString(parent) << endl;
-				//cout << "node color: " << RBTNodeToString(node) << endl;
+				//cout << "grandparent : " << RBTNodeToString(grandparent) << endl;
+				//cout << "parent: " << RBTNodeToString(parent) << endl;
+				//cout << "node : " << RBTNodeToString(node) << endl;
 				
+			} else if (uncle->color == COLOR_RED){
+				parent->color = COLOR_BLACK;			// only recolor when uncle is red
+				uncle->color = COLOR_BLACK;
+				grandparent->color = COLOR_RED;
 			}
 			
 		} else if (parent == grandparent->right) {
 			uncle = grandparent->left;
 			
-			if (uncle == nullptr) {
+			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
+				if (node == parent->left){
+					RotateRight(parent);
+					node = parent;
+					parent = node->parent;
+				}
 				
 				RotateLeft(grandparent);
 				grandparent->color = COLOR_RED;
 				parent->color = COLOR_BLACK;
+				
+			} else if (uncle->color == COLOR_RED){
+				parent->color = COLOR_BLACK;
+				uncle->color = COLOR_BLACK;
+				grandparent->color = COLOR_RED;
 			}
 		}
 	}
 	
-	root->color = COLOR_BLACK;				// make sure root node is black
-	AllNodes.push_back(node);
+	root->color = COLOR_BLACK;				// make sure root node is always black
 	numItems++;
-	// if parent is red, check color of uncle (uncle = black (null) => rotate + recolor , uncle = red -> recolor
 }
 
 bool RedBlackTree::Contains(int n){
@@ -139,8 +164,10 @@ bool RedBlackTree::Contains(int n){
 	while (tmp != nullptr){
 		if (tmp->data == n){
 			return true;
+			
 		} else if (tmp->data > n){
 			tmp = tmp->left;
+			
 		} else {
 			tmp = tmp->right;
 		}
@@ -155,14 +182,11 @@ int RedBlackTree::GetMin(){
 		throw invalid_argument("Tree is empty! There's no minimum value!");	
 	}
 	
-	int min = tmp->data;
-	
 	while (tmp->left != nullptr){
 		tmp = tmp->left;
-		min = tmp->data;
 	}
 	
-	return min;
+	return tmp->data;
 }
 
 int RedBlackTree::GetMax(){
@@ -170,16 +194,13 @@ int RedBlackTree::GetMax(){
 	
 	if (tmp == nullptr){
 		throw invalid_argument("Tree is empty! There's no maximum value!");	
-	}
-	
-	int max = tmp->data; 
+	} 
 	
 	while (tmp->right != nullptr){
 		tmp = tmp->right;
-		max = tmp->data;
 	}
 	
-	return max;
+	return tmp->data;
 }
 
 int RedBlackTree::Size(){
@@ -189,9 +210,9 @@ int RedBlackTree::Size(){
 string RedBlackTree::RBTNodeToString(RBTNode* node) const{
 	string s = " ";
 	
-	if (node->color == 0){
+	if (node->color == COLOR_RED){
 		s += "R";
-	} else if (node->color == 1){
+	} else if (node->color == COLOR_BLACK){
 		s += "B"; 
 	}
 		
@@ -202,26 +223,25 @@ string RedBlackTree::RBTNodeToString(RBTNode* node) const{
 
 string RedBlackTree::ToInfixString(RBTNode* node) const{
 	string s = "";
-	
-	if (node == nullptr){
-		return s;
-	}
-	
-	if (node->left != nullptr){
-		s += ToPrefixString(node->left);
-	} 
-	s += RBTNodeToString(node);
+
+	if (node != nullptr){
 		
+		if (node->left != nullptr){
+			s += ToInfixString(node->left);
+		} 
 		
-	if (node->right != nullptr){
-		s += ToPrefixString(node->right);
+		s += RBTNodeToString(node);
+		
+		if (node->right != nullptr){
+			s += ToInfixString(node->right);
+		}
 	}
 	
 	return s;
 }
 
 string RedBlackTree::ToPrefixString(RBTNode* node) const{
-	string s;
+	string s = "";
 	
 	if (node != nullptr){
 		
@@ -240,21 +260,20 @@ string RedBlackTree::ToPrefixString(RBTNode* node) const{
 }
 
 string RedBlackTree::ToPostfixString(RBTNode* node) const{
-	string s;
-
-	if (numItems == 0){
-		return s;
+	string s = "";
+	
+	if (node != nullptr){
+		
+		if (node->left != nullptr){
+			s += ToPostfixString(node->left);
+		} 
+		
+		if (node->right != nullptr){
+			s += ToPostfixString(node->right);
+		}
+		
+		s += RBTNodeToString(node);
 	}
-	
-	if (node->left != nullptr){
-		s += ToPrefixString(node->left);
-	} 
-	
-	if (node->right != nullptr){
-		s += ToPrefixString(node->right);
-	}
-	
-	s += RBTNodeToString(node);
 
 	return s;
 }
