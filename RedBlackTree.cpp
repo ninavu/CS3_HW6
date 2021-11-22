@@ -2,7 +2,6 @@
 #include <random>
 #include <string>
 #include <vector>
-#include <climits>
 #include "RedBlackTree.h"
 
 using namespace std;
@@ -17,17 +16,18 @@ RedBlackTree::RedBlackTree(const RedBlackTree& rbt){
 	while (root != nullptr){
 		root->data = rbt.root->data;
 		root->color = rbt.root->color;
+		//root->parent = nullptr;
 		
-		if (root->left != nullptr){
-			root = root->left;
+		if (rbt.root->left != nullptr){
+			root->left = rbt.root->left;
 		}
 		
-		if (root->right != nullptr){
-			root = root->right;
+		if (rbt.root->right != nullptr){
+			root->right = rbt.root->right;
 		}
 	}
 	
-	//RBTNode root_copy = *root;		// copy the color, data, left, child, parent
+	// copy the color, data, left, child, parent
 	numItems = rbt.numItems;	
 }
 
@@ -39,11 +39,15 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 		root = tmp;
 		tmp->parent = nullptr;
 		
-	} else if (node == node->parent->left){		
-		node->parent->left = tmp;
+	} else {
+		tmp->parent = node->parent;
 		
-	} else if (node == node->parent->right){		// switch the middle value with the parent
-		node->parent->right = tmp;
+		if (node == node->parent->left){		
+			tmp->parent->left = tmp;
+			
+		} else if (node == node->parent->right){		// switch the middle value with the parent
+			tmp->parent->right = tmp;
+		}
 	}
 	
 	tmp->left = node;			
@@ -58,18 +62,22 @@ void RedBlackTree::RotateRight(RBTNode* node){
 		root = tmp;
 		tmp->parent = nullptr;
 		
-	} else if (node == node->parent->right){		// switch the middle value with the parent
-		node->parent->right = tmp;
+	} else {
+		tmp->parent = node->parent;
 		
-	} else if (node == node->parent->left){
-		node->parent->left = tmp;
+		if (node == node->parent->left){		
+			tmp->parent->left = tmp;
+			
+		} else if (node == node->parent->right){		// switch the middle value with the parent
+			tmp->parent->right = tmp;
+		}
 	}
 	
 	tmp->right = node;			
 	node->parent = tmp;
 }
 
-/* An Insert helper function that recursively calls itself 
+/* A private Insert helper function that recursively calls itself 
  * to add new nodes into the tree that match the properties of 
  * a binary search tree */
 RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
@@ -109,40 +117,40 @@ void RedBlackTree::Insert(int n){
 		RBTNode* grandparent = parent->parent;
 		RBTNode* uncle = new RBTNode;
 		
-		if (parent == grandparent->left){
+		if (parent == grandparent->left){				// set uncle depends on the parent's position
 			uncle = grandparent->right;
 
-			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
+			if (uncle == nullptr || uncle->color == COLOR_BLACK) {		// rotate and recolor when uncle is black
 				if (node == parent->right){
-					RotateLeft(parent);
+					RotateLeft(parent);					// rotate the parent with the left right case
 					node = parent;						// change pointers after rotating before going into another rotation
 					parent = node->parent;
 				}
 				
-				RotateRight(grandparent);				// rotate and recolor when uncle is black
+				RotateRight(grandparent);				// rotate the grandparent with the left left/left right case
 				grandparent->color = COLOR_RED;			
 				parent->color = COLOR_BLACK;
-				//cout << "grandparent : " << RBTNodeToString(grandparent) << endl;
-				//cout << "parent: " << RBTNodeToString(parent) << endl;
-				//cout << "node : " << RBTNodeToString(node) << endl;
+				//cout << "grandparent node: " << RBTNodeToString(grandparent) << endl;
+				//cout << "parent node: " << RBTNodeToString(parent) << endl;
 				
 			} else if (uncle->color == COLOR_RED){
 				parent->color = COLOR_BLACK;			// only recolor when uncle is red
 				uncle->color = COLOR_BLACK;
 				grandparent->color = COLOR_RED;
+				node = grandparent;						// make sure the property is maintained up to the root
 			}
 			
-		} else if (parent == grandparent->right) {
+		} else if (parent == grandparent->right) {			// mirror case
 			uncle = grandparent->left;
 			
 			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
 				if (node == parent->left){
-					RotateRight(parent);
+					RotateRight(parent);				// rotate the parent with the right left case
 					node = parent;
 					parent = node->parent;
 				}
 				
-				RotateLeft(grandparent);
+				RotateLeft(grandparent);				// rotate the grandparent with the right right/right left case
 				grandparent->color = COLOR_RED;
 				parent->color = COLOR_BLACK;
 				
@@ -150,6 +158,7 @@ void RedBlackTree::Insert(int n){
 				parent->color = COLOR_BLACK;
 				uncle->color = COLOR_BLACK;
 				grandparent->color = COLOR_RED;
+				node = grandparent;
 			}
 		}
 	}

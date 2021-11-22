@@ -258,38 +258,59 @@ void TestInsertRandomTests(){
 	rbt->Insert(12);
 	cout << endl;
 	//cout << "tree: " << rbt->ToInfixString() << endl;
+	assert(rbt->ToInfixString() == " R12  B13  B15  B20 ");
 	delete rbt;
-	
-	
+
+
 	// probably should have a delete or something here
 	rbt = new RedBlackTree();
 	//cout << endl << "NEW TREE" << endl;
 	rbt->Insert(12);
-	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(11);
-	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(15);
-	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(5);
 	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(13);
 	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(7);
 	//cout << "tree: "  << rbt->ToInfixString() << endl;
+	assert(rbt->ToInfixString() == " R5  B7  R11  B12  R13  B15 ");
 	delete rbt;
 	
 	
 	rbt = new RedBlackTree();
 	//cout << endl << "NEW TREE" << endl;
 	rbt->Insert(12);
-	//cout << "tree: "  << rbt->ToPrefixString() << endl;
 	rbt->Insert(10);
-	//cout << "tree: "  << rbt->ToPrefixString() << endl;
 	rbt->Insert(8);
-	//cout << "tree: "  << rbt->ToPrefixString() << endl;
-	delete rbt;
+	rbt->Insert(19);
+	rbt->Insert(21);
+	rbt->Insert(7);		
+	rbt->Insert(0);
+	rbt->Insert(13);
+	rbt->Insert(54);
+	rbt->Insert(28);
+	rbt->Insert(2);
+	rbt->Insert(9);
+	rbt->Insert(11);
+	rbt->Insert(20);
+	rbt->Insert(5);
+	rbt->Insert(15);
+	rbt->Insert(14);
+	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	
-	cout << "more random tests: " << endl;
+	try{
+		rbt->Insert(19);
+		assert(false);
+		
+		rbt->Insert(13);
+		assert(false);
+		
+	} catch(const invalid_argument& e){
+		
+	}
+	
+	assert(rbt->ToInfixString() == " R0  B2  R5  B7  B8  R9  B10  B11  R12  R13  B14  R15  B19  R20  B21  R28  B54 ");
 	
 	cout << "PASSED!" << endl << endl;
 }
@@ -335,19 +356,60 @@ void TestContains(){
 	rbt->Insert(34);
 	
 	assert(rbt->Contains(34));
+	assert(rbt->Contains(35) == false);
+	assert(rbt->Contains(22));
+	assert(rbt->Contains(28) == false);
 	delete rbt;
 
-	
-	cout << "TESTS MISSING" << endl << endl;
 	cout << "PASSED!" << endl << endl;
 }
 
 
 void TestGetMinimumMaximum(){
 	cout << "Testing Get Minimum and Get Maximum..." << endl;
+	
+	RedBlackTree *rbt = new RedBlackTree();
+	
+	try{
+		rbt->GetMax(); 
+		assert(false);
+		
+		rbt->GetMin(); 
+		assert(false);
+		
+	} catch(const invalid_argument& e){
+		
+	}
 
-	cout << "TESTS MISSING" << endl << endl;
+	rbt->Insert(40);
+	rbt->Insert(22);
+	rbt->Insert(15);
+	rbt->Insert(31);
+	rbt->Insert(55);
+	rbt->Insert(12);
+	rbt->Insert(17);
+	rbt->Insert(29);
+	rbt->Insert(34);
+	
+	assert(rbt->GetMax() == 55);
+	assert(rbt->GetMin() == 12);
+	delete rbt;
+	
+	rbt = new RedBlackTree();
+	rbt->Insert(19);
+	rbt->Insert(10);
+	rbt->Insert(21);
+	rbt->Insert(7);
+	rbt->Insert(0);
+	rbt->Insert(13);
+	rbt->Insert(54);
+	rbt->Insert(28);
 
+	assert(rbt->GetMax() == 54);
+	assert(rbt->GetMin() == 0);
+	delete rbt;
+
+	//cout << "TESTS MISSING" << endl << endl;
 	cout << "PASSED!" << endl << endl;
 }
 
@@ -366,11 +428,10 @@ int main(){
 	TestToStrings();
 	TestInsertRandomTests();
 
-	TestCopyConstructor();
-
 	TestContains();
 	TestGetMinimumMaximum();
-
+	
+	TestCopyConstructor();
 	
 	cout << "ALL TESTS PASSED!!" << endl;
 	return 0;
