@@ -269,12 +269,24 @@ void TestInsertRandomTests(){
 	rbt->Insert(11);
 	rbt->Insert(15);
 	rbt->Insert(5);
-	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(13);
-	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	rbt->Insert(7);
 	//cout << "tree: "  << rbt->ToInfixString() << endl;
 	assert(rbt->ToInfixString() == " R5  B7  R11  B12  R13  B15 ");
+	delete rbt;
+	
+	rbt = new RedBlackTree();	
+	//cout << endl << "NEW TREE" << endl;
+	rbt->Insert(8);			// adding 8 nodes
+	rbt->Insert(18);
+	rbt->Insert(5);
+	rbt->Insert(15);
+	rbt->Insert(17);
+	rbt->Insert(25);
+	rbt->Insert(40);
+	rbt->Insert(80);
+	//cout << "tree: "  << rbt->ToInfixString() << endl;
+	assert(rbt->ToInfixString() == " B5  R8  B15  B17  B18  R25  B40  R80 ");
 	delete rbt;
 	
 	
@@ -329,13 +341,13 @@ void TestCopyConstructor(){
 	assert(rbt1.ToPrefixString() == " B11  B9  R4  B31  R23  R52 ");
 
 	RedBlackTree rbt2 = RedBlackTree(rbt1);
-	cout << "tree 2: "  << rbt2.ToPrefixString() << endl;
+	//cout << "tree 2: "  << rbt2.ToPrefixString() << endl;
 
 	assert(rbt2.ToPrefixString() == rbt1.ToPrefixString());
 
 	rbt1.Insert(200);
-	cout << "tree 1: "  << rbt1.ToPrefixString() << endl;
-	cout << "tree 2: "  << rbt2.ToPrefixString() << endl;
+	//cout << "tree 1: "  << rbt1.ToPrefixString() << endl;
+	//cout << "tree 2: "  << rbt2.ToPrefixString() << endl;
 	assert(rbt2.ToPrefixString() != rbt1.ToPrefixString());
 
 	cout << "PASSED!" << endl << endl;
@@ -384,10 +396,8 @@ void TestGetMinimumMaximum(){
 	rbt->Insert(40);
 	rbt->Insert(22);
 	rbt->Insert(15);
-	rbt->Insert(31);
 	rbt->Insert(55);
 	rbt->Insert(12);
-	rbt->Insert(17);
 	rbt->Insert(29);
 	rbt->Insert(34);
 	
@@ -398,10 +408,8 @@ void TestGetMinimumMaximum(){
 	rbt = new RedBlackTree();
 	rbt->Insert(19);
 	rbt->Insert(10);
-	rbt->Insert(21);
 	rbt->Insert(7);
 	rbt->Insert(0);
-	rbt->Insert(13);
 	rbt->Insert(54);
 	rbt->Insert(28);
 
@@ -416,7 +424,6 @@ void TestGetMinimumMaximum(){
 
 int main(){
 
-	
 	TestSimpleConstructor();
 	
 	TestInsertFirstNode();

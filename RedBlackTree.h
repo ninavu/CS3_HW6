@@ -19,7 +19,7 @@ class RedBlackTree {
 	public:
 		RedBlackTree();  	//simple constructor
 		RedBlackTree(const RedBlackTree& rbt);			//copy constructor
-		~RedBlackTree();	// destructor
+		~RedBlackTree();	// incomplete destructor
 		
 		void Insert(int num);
 		bool Contains(int num);

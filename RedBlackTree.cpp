@@ -11,25 +11,54 @@ RedBlackTree::RedBlackTree(){
 	numItems = 0;
 }
 
+
 RedBlackTree::RedBlackTree(const RedBlackTree& rbt){
+	numItems = rbt.numItems;
 	
-	while (root != nullptr){
-		root->data = rbt.root->data;
+	if (rbt.root == nullptr){		// if rbt is empty, root is always null
+		root = nullptr;
+		
+	} else {
+	
+		root = new RBTNode;						// initiate the root since it is currently null, or else seg fault
+		root->data = rbt.root->data;			// copy non-pointer elements from the root if rbt is not empty
 		root->color = rbt.root->color;
-		//root->parent = nullptr;
 		
-		if (rbt.root->left != nullptr){
-			root->left = rbt.root->left;
-		}
+		RBTNode* tmp = rbt.root;				// create tmp nodes to separate the original pointers
+		RBTNode* tmp_copy = root;
 		
-		if (rbt.root->right != nullptr){
-			root->right = rbt.root->right;
+		while (tmp != nullptr){
+			RBTNode* cur = new RBTNode;			// create a new cur node to traverse the whole tree
+			
+			if (tmp->left != nullptr && tmp_copy->left == nullptr){
+				
+				cur->data = tmp->left->data;		// copy non-pointer elements
+				cur->color = tmp->left->color;
+				tmp_copy->left = cur;				// copy the whole non-pointer elements into tmp_copy
+				cur->parent = tmp_copy;				// mark parent-child relationship between 2 pointers	
+				
+				tmp = tmp->left;					// update tmp and tmp_copy to keep traversing the left side
+				tmp_copy = tmp_copy->left;
+				
+			} else if (tmp->right != nullptr && tmp_copy->right == nullptr){	// mirror case: traverse the tree and copy the right side
+				
+				cur->data = tmp->right->data;
+				cur->color = tmp->right->color;
+				tmp_copy->right = cur;
+				cur->parent = tmp_copy;
+				
+				tmp = tmp->right;
+				tmp_copy = tmp_copy->right;
+				
+			} else {		// if there's no left and right nodes left, go up 1 level until tmp->parent is null
+				
+				tmp = tmp->parent;				
+				tmp_copy = tmp_copy->parent;
+			}
 		}
 	}
-	
-	// copy the color, data, left, child, parent
-	numItems = rbt.numItems;	
 }
+
 
 void RedBlackTree::RotateLeft(RBTNode* node){
 	RBTNode* tmp = node->right;	
@@ -54,6 +83,7 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 	node->parent = tmp;
 }
 
+
 void RedBlackTree::RotateRight(RBTNode* node){
 	RBTNode* tmp = node->left;		// a tmp node points to the middle value
 	node->left = tmp->right;		// open a new slot on the right and remove pointer from node to tmp
@@ -77,6 +107,7 @@ void RedBlackTree::RotateRight(RBTNode* node){
 	node->parent = tmp;
 }
 
+
 /* A private Insert helper function that recursively calls itself 
  * to add new nodes into the tree that match the properties of 
  * a binary search tree */
@@ -99,6 +130,7 @@ RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
 	
 	return r;
 } 
+
 
 void RedBlackTree::Insert(int n){
 
@@ -167,6 +199,7 @@ void RedBlackTree::Insert(int n){
 	numItems++;
 }
 
+
 bool RedBlackTree::Contains(int n){
 	RBTNode* tmp = root;
 	
@@ -184,6 +217,7 @@ bool RedBlackTree::Contains(int n){
 	return false;
 }
 
+
 int RedBlackTree::GetMin(){
 	RBTNode* tmp = root;
 	
@@ -197,6 +231,7 @@ int RedBlackTree::GetMin(){
 	
 	return tmp->data;
 }
+
 
 int RedBlackTree::GetMax(){
 	RBTNode* tmp = root;
@@ -212,9 +247,11 @@ int RedBlackTree::GetMax(){
 	return tmp->data;
 }
 
+
 int RedBlackTree::Size(){
 	return numItems;
 }
+
 
 string RedBlackTree::RBTNodeToString(RBTNode* node) const{
 	string s = " ";
@@ -229,6 +266,7 @@ string RedBlackTree::RBTNodeToString(RBTNode* node) const{
 	s += " ";
 	return s;
 } 
+
 
 string RedBlackTree::ToInfixString(RBTNode* node) const{
 	string s = "";
@@ -249,6 +287,7 @@ string RedBlackTree::ToInfixString(RBTNode* node) const{
 	return s;
 }
 
+
 string RedBlackTree::ToPrefixString(RBTNode* node) const{
 	string s = "";
 	
@@ -267,6 +306,7 @@ string RedBlackTree::ToPrefixString(RBTNode* node) const{
 
 	return s;
 }
+
 
 string RedBlackTree::ToPostfixString(RBTNode* node) const{
 	string s = "";
@@ -287,6 +327,9 @@ string RedBlackTree::ToPostfixString(RBTNode* node) const{
 	return s;
 }
 
+
+/* A private destructor helper function that recursively calls itself 
+ * to delete all the nodes */
 void RedBlackTree::DeleteNode(RBTNode* node){
 		
 	if (node != nullptr){
@@ -302,6 +345,7 @@ void RedBlackTree::DeleteNode(RBTNode* node){
 		delete node;
 	}
 }
+
 
 RedBlackTree::~RedBlackTree(){
 	DeleteNode(root);
