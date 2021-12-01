@@ -50,7 +50,7 @@ RedBlackTree::RedBlackTree(const RedBlackTree& rbt){
 				tmp = tmp->right;
 				tmp_copy = tmp_copy->right;
 				
-			} else {		// if there's no left and right nodes left, go up 1 level until tmp->parent is null
+			} else {		// if there's no left and right nodes left, keep going up 1 level until tmp->parent is null
 				
 				tmp = tmp->parent;				
 				tmp_copy = tmp_copy->parent;
@@ -64,11 +64,16 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 	RBTNode* tmp = node->right;	
 	node->right = tmp->left;			// open a new slot on the left and remove pointer from node to tmp
 	
+	if (node->right != nullptr){		// when there's a left child of tmp, point it directly to the node instead
+		node->right->parent = node;
+		//cout << "node-right: " << RBTNodeToString(node->right) << endl;
+	} 
+	
 	if (node->parent == nullptr){		// if node is the root, tmp node becomes the new root
 		root = tmp;
 		tmp->parent = nullptr;
 		
-	} else {
+	} else {									// create new parent-child relationship
 		tmp->parent = node->parent;
 		
 		if (node == node->parent->left){		
@@ -87,6 +92,11 @@ void RedBlackTree::RotateLeft(RBTNode* node){
 void RedBlackTree::RotateRight(RBTNode* node){
 	RBTNode* tmp = node->left;		// a tmp node points to the middle value
 	node->left = tmp->right;		// open a new slot on the right and remove pointer from node to tmp
+	
+	if (node->left != nullptr){		// when there's a right child of tmp, point it directly to the node instead
+		node->left->parent = node;
+		//cout << "node-left: " << RBTNodeToString(node->left) << endl;
+	} 
 
 	if (node->parent == nullptr){		// if node is the root, tmp node becomes the new root
 		root = tmp;
@@ -141,7 +151,7 @@ void RedBlackTree::Insert(int n){
 		throw invalid_argument("Node already exists in the tree!");	
 	} 
 	
-	root = InsertNode(root, node);			// call a recursive function on root to keep traversing the tree and adding new nodes
+	root = InsertNode(root, node);			// call a recursive function to keep traversing the tree from the root and adding new nodes
 	
 	// exit if the parent of the new node is black/null, otherwise move on to the balancing steps
 	while (node != root && node->parent->color == COLOR_RED){		// make sure node is not the root to avoid segmentation fault
@@ -155,7 +165,7 @@ void RedBlackTree::Insert(int n){
 			if (uncle == nullptr || uncle->color == COLOR_BLACK) {		// rotate and recolor when uncle is black
 				if (node == parent->right){
 					RotateLeft(parent);					// rotate the parent with the left right case
-					node = parent;						// change pointers after rotating before going into another rotation
+					node = parent;						// change pointers after the first rotation before going into another rotation
 					parent = node->parent;
 				}
 				
@@ -166,13 +176,13 @@ void RedBlackTree::Insert(int n){
 				//cout << "parent node: " << RBTNodeToString(parent) << endl;
 				
 			} else if (uncle->color == COLOR_RED){
-				parent->color = COLOR_BLACK;			// only recolor when uncle is red
-				uncle->color = COLOR_BLACK;
+				parent->color = COLOR_BLACK;			// when uncle is red, only recolor
+				uncle->color = COLOR_BLACK;				// push blackness down onto parent and uncle
 				grandparent->color = COLOR_RED;
 				node = grandparent;						// make sure the property is maintained up to the root
 			}
 			
-		} else if (parent == grandparent->right) {			// mirror case
+		} else if (parent == grandparent->right) {		// mirror case
 			uncle = grandparent->left;
 			
 			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
@@ -329,7 +339,7 @@ string RedBlackTree::ToPostfixString(RBTNode* node) const{
 
 
 /* A private destructor helper function that recursively calls itself 
- * to delete all the nodes */
+ * to delete all the nodes - NOT COMPLETE */
 void RedBlackTree::DeleteNode(RBTNode* node){
 		
 	if (node != nullptr){
