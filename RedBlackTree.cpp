@@ -143,13 +143,12 @@ RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
 
 
 void RedBlackTree::Insert(int n){
-
-	RBTNode* node = new RBTNode;
-	node->data = n;
-	
 	if (Contains(n)){						// BST doesn't allow duplicate numbers
 		throw invalid_argument("Node already exists in the tree!");	
 	} 
+	
+	RBTNode* node = new RBTNode;
+	node->data = n;
 	
 	root = InsertNode(root, node);			// call a recursive function to keep traversing the tree from the root and adding new nodes
 	
@@ -207,6 +206,99 @@ void RedBlackTree::Insert(int n){
 	
 	root->color = COLOR_BLACK;				// make sure root node is always black
 	numItems++;
+}
+
+/* Remove BST: 
+ * search for the node -> 3 cases: 0 child, 1 child, 2 children
+ * 0 child -> just get rid of it
+ * 1 child -> replace the child with the deleted node
+ * 2 child -> recursion: in order successor (right, all the way to the left) : replace the data with the root
+ */
+ 
+/* A private helper function that finds the nodes in the tree 
+ * in the right position
+ */
+RBTNode* RedBlackTree::FindNode(RBTNode* r, int n){
+	RBTNode* tmp = r;
+	
+	while (tmp != nullptr){
+		if (tmp->data == n){
+			return tmp;
+			
+		} else if (tmp->data > n){
+			tmp = tmp->left;
+			
+		} else {
+			tmp = tmp->right;
+		}
+	}
+	return nullptr;
+}
+
+
+void RedBlackTree::SwitchParent(RBTNode* dnode, RBTNode* rnode){
+	
+	if (dnode == root){		// if dnode is the root (has no parent), then rnode becomes the new root
+		root = rnode;
+		
+	} else if (dnode == dnode->parent->left){			// whether dnode is the right or left child
+		dnode->parent->left = rnode;
+		
+	} else if (dnode == dnode->parent->right){
+		dnode->parent->right = rnode;
+	}
+	
+	rnode->parent = dnode->parent;		// assign dnode's parent to rnode's parent
+}
+
+
+void RedBlackTree::FixDoubleBlack(RBTNode* node){
+	
+
+}
+
+
+void RedBlackTree::Remove(int n){
+	
+	if (Contains(n) == false){						// cannot remove node that doesn't exist
+		throw invalid_argument("Node doesn't exist in the tree!");	
+	} 
+	
+	RBTNode* del_node = FindNode(root, n);		// node to be deleted
+	RBTNode* rep_node = new RBTNode;			// replacement node	
+	cout << "del node: " << RBTNodeToString(del_node) << endl;
+	
+	/* the deleted node either has one child or no child: 
+	 * one child: the replacement node becomes that child
+	 * no child: the replacement node can be any child since both children are nullptr/black
+	 */
+	if (del_node->left == nullptr){					// deleted node has no left child
+		
+		rep_node = del_node->right;
+		cout << "rep node: " << RBTNodeToString(rep_node) << endl;
+		SwitchParent(del_node, rep_node);	
+		
+	} else if (del_node->right == nullptr){			// deleted node has no right child
+		rep_node = del_node->left;
+		cout << "rep node: " << RBTNodeToString(rep_node) << endl;
+		SwitchParent(del_node, rep_node);			
+	}
+	
+	/*
+	if (rep_node == root || rep_node->color == COLOR_RED){
+		rep_node->color = COLOR_BLACK;
+	}
+	
+
+	if (rep_node->color == COLOR_BLACK || del_node->color == COLOR_BLACK){
+		//double black situation
+		rep_node->color = COLOR_DOUBLE_BLACK;
+		//fix double black
+	} */
+	
+	if (rep_node->color == COLOR_RED){			// should add rep_node == root as well?
+		rep_node->color = COLOR_BLACK;	
+	}
 }
 
 

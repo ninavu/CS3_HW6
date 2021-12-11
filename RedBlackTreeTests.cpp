@@ -401,6 +401,129 @@ void TestCopyConstructor(){
 }
 
 
+void TestRemoveOneChild(){
+	cout << "Testing Remove Node With One Child... " << endl;
+	
+	RedBlackTree *rbt = new RedBlackTree();
+	rbt->Insert(19);
+	rbt->Insert(14);
+	
+	rbt->Remove(19);
+	assert(rbt->ToPrefixString() == " B14 ");
+	
+	rbt->Insert(9);
+	rbt->Insert(5);
+	rbt->Insert(11);
+	rbt->Insert(2);
+	rbt->Insert(7);
+	rbt->Insert(6);
+	rbt->Insert(3);
+	assert(rbt->ToPrefixString() == " B9  R5  B2  R3  B7  R6  B14  R11 ");
+	
+	rbt->Remove(7);		//right left case
+	assert(rbt->ToPrefixString() == " B9  R5  B2  R3  B6  B14  R11 ");
+	
+	rbt->Remove(14);
+	assert(rbt->ToPrefixString() == " B9  R5  B2  R3  B6  B11 ");
+	
+	rbt->Remove(2);		// left right case
+	assert(rbt->ToPrefixString() == " B9  R5  B3  B6  B11 ");
+	
+	rbt->Insert(0);
+	rbt->Insert(16);
+	rbt->Remove(3);		// left left case
+	assert(rbt->ToPrefixString() == " B9  R5  B0  B6  B11  R16 ");
+	
+	rbt->Remove(11);	// right right case
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B9  R5  B0  B6  B16 ");
+
+	delete rbt;
+
+	cout << "PASSED!" << endl << endl;
+}
+
+
+void TestRemoveTwoChildren(){
+	cout << "Testing Remove Node With Two Children..." << endl;
+	RedBlackTree *rbt = new RedBlackTree();
+	rbt->Insert(40);
+	rbt->Insert(22);
+	rbt->Insert(15);
+	rbt->Insert(31);
+	rbt->Insert(55);
+	rbt->Insert(12);
+	rbt->Insert(17);
+	rbt->Insert(29);
+	rbt->Insert(34);
+	
+	assert(rbt->Contains(34));
+	assert(rbt->Contains(35) == false);
+	assert(rbt->Contains(22));
+	assert(rbt->Contains(28) == false);
+	delete rbt;
+
+	cout << "PASSED!" << endl << endl;
+}
+
+void TestRemoveDoubleBlack(){
+	cout << "Testing Remove (Double Black Condition)..." << endl;
+	RedBlackTree *rbt = new RedBlackTree();
+	rbt->Insert(40);
+	rbt->Insert(22);
+	rbt->Insert(15);
+	rbt->Insert(31);
+	rbt->Insert(55);
+	rbt->Insert(12);
+	rbt->Insert(17);
+	rbt->Insert(29);
+	rbt->Insert(34);
+	
+	assert(rbt->Contains(34));
+	assert(rbt->Contains(35) == false);
+	assert(rbt->Contains(22));
+	assert(rbt->Contains(28) == false);
+	delete rbt;
+
+	cout << "PASSED!" << endl << endl;
+}
+
+
+void TestRemoveLeaf(){
+	cout << "Testing Remove Leaf..." << endl;
+	RedBlackTree *rbt = new RedBlackTree();
+	rbt->Insert(14);
+	rbt->Insert(9);
+	rbt->Insert(5);
+	rbt->Insert(11);
+	rbt->Insert(2);
+	rbt->Insert(7);
+	rbt->Insert(6);
+	assert(rbt->ToPrefixString() == " B2  R5  R6  B7  B9  R11  B14 ");
+	
+	rbt->Remove(11);
+	assert(rbt->ToPrefixString() == " B2  R5  R6  B7  B9  B14 ");
+	
+	rbt->Remove(6);
+	assert(rbt->ToPrefixString() == " B2  R5  B7  B9  B14 ");
+	
+	rbt->Remove(2);
+	assert(rbt->ToPrefixString() == " B5  R7  B9  B14 ");
+	
+	rbt->Remove(7);
+	assert(rbt->ToPrefixString() == " B5  R7  B9  B14 ");
+	
+	rbt->Remove(5);
+	assert(rbt->ToPrefixString() == " B30 ");
+	
+	rbt->Remove(9);
+	assert(rbt->ToPrefixString() == " B30 ");
+
+	delete rbt;
+
+	cout << "PASSED!" << endl << endl;
+}
+
 void TestContains(){
 	cout << "Testing Contains..." << endl;
 	RedBlackTree *rbt = new RedBlackTree();
@@ -464,7 +587,6 @@ void TestGetMinimumMaximum(){
 	assert(rbt->GetMin() == 0);
 	delete rbt;
 
-	//cout << "TESTS MISSING" << endl << endl;
 	cout << "PASSED!" << endl << endl;
 }
 
@@ -481,6 +603,11 @@ int main(){
 
 	TestToStrings();
 	TestInsertRandomTests();
+	
+	TestRemoveOneChild();
+	TestRemoveTwoChildren();
+	TestRemoveDoubleBlack();
+	TestRemoveLeaf();
 
 	TestContains();
 	TestGetMinimumMaximum();
