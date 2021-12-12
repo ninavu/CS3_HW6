@@ -209,16 +209,18 @@ void RedBlackTree::Insert(int n){
 }
 
 /* Remove BST: 
- * search for the node -> 3 cases: 0 child, 1 child, 2 children
  * 0 child -> just get rid of it
- * 1 child -> replace the child with the deleted node
  * 2 child -> recursion: in order successor (right, all the way to the left) : replace the data with the root
  */
  
 /* A private helper function that finds the nodes in the tree 
- * in the right position
- */
+ * in the right position */
 RBTNode* RedBlackTree::FindNode(RBTNode* r, int n){
+	
+	if (Contains(n) == false){						// cannot remove node that doesn't exist
+		throw invalid_argument("Node doesn't exist in the tree!");	
+	} 
+	
 	RBTNode* tmp = r;
 	
 	while (tmp != nullptr){
@@ -235,6 +237,19 @@ RBTNode* RedBlackTree::FindNode(RBTNode* r, int n){
 	return nullptr;
 }
 
+RBTNode* RedBlackTree::MinNode(RBTNode* snode){
+	
+	if (snode == nullptr){
+		throw invalid_argument("Tree is empty! There's no minimum value!");	
+	}
+	
+	while (snode->left != nullptr){
+		snode = snode->left;
+	}
+	
+	return snode;
+}
+
 
 void RedBlackTree::SwitchParent(RBTNode* dnode, RBTNode* rnode){
 	
@@ -248,55 +263,148 @@ void RedBlackTree::SwitchParent(RBTNode* dnode, RBTNode* rnode){
 		dnode->parent->right = rnode;
 	}
 	
-	rnode->parent = dnode->parent;		// assign dnode's parent to rnode's parent
+	if (rnode != nullptr){
+		rnode->parent = dnode->parent;		// assign dnode's parent to rnode's parent
+	}
 }
 
 
 void RedBlackTree::FixDoubleBlack(RBTNode* node){
 	
-
+	RBTNode* sibling = new RBTNode;
+	RBTNode* parent = node->parent;
+	
+	while (node != root && node->color == COLOR_DOUBLE_BLACK){
+		
+		if (node == parent->left){
+			sibling = parent->right;
+			
+			if (sibling->color == COLOR_RED){
+				parent->color = COLOR_RED;
+				sibling->color = COLOR_BLACK;
+				RotateLeft(parent);
+				
+			} else if (sibling->color == COLOR_BLACK){
+				
+				if (sibling->left->color == COLOR_BLACK && sibling->right->color == COLOR_BLACK){
+					sibling->color = COLOR_RED;
+					
+					if (parent->color == COLOR_RED){
+						parent->color = COLOR_BLACK;
+					} else {
+						parent->color = COLOR_DOUBLE_BLACK;
+					}
+					node = parent;					// move the double black up to the parent
+					
+				} else {
+					
+					if (sibling->right == nullptr || sibling->right->color == COLOR_BLACK){	
+						RotateRight(sibling);
+						sibling->left->color = COLOR_BLACK;
+						sibling->color = COLOR_RED;
+						sibling = parent->right;
+					}
+					RotateLeft(parent);
+					sibling->color = parent->color;
+					sibling->right->color = COLOR_BLACK;
+					parent->color = COLOR_BLACK;
+				}
+			}
+			
+		} else if (node == node->parent->right){
+			sibling = node->parent->left;
+			
+			if (sibling->color == COLOR_RED){
+				parent->color = COLOR_RED;
+				sibling->color = COLOR_BLACK;
+				RotateRight(parent);
+				
+			} else if (sibling->color == COLOR_BLACK){
+				
+				if (sibling->left->color == COLOR_BLACK && sibling->right->color == COLOR_BLACK){
+					sibling->color = COLOR_RED;
+					
+					if (parent->color == COLOR_RED){
+						parent->color = COLOR_BLACK;
+					} else {
+						parent->color = COLOR_DOUBLE_BLACK;
+					}
+					node = parent;					// move the double black up to the parent
+					
+				} else {
+					
+					if (sibling->left == nullptr || sibling->left->color == COLOR_BLACK){
+						RotateLeft(sibling);
+						sibling->left->color = COLOR_BLACK;
+						sibling->color = COLOR_RED;
+						sibling = parent->right;
+					}
+					RotateRight(parent);
+					sibling->color = parent->color;
+					sibling->right->color = COLOR_BLACK;
+					parent->color = COLOR_BLACK;
+				}
+			}	
+		}
+	}
+	
+	node->color = COLOR_BLACK;		// eject double-blackness out of root node
 }
 
 
 void RedBlackTree::Remove(int n){
-	
-	if (Contains(n) == false){						// cannot remove node that doesn't exist
-		throw invalid_argument("Node doesn't exist in the tree!");	
-	} 
-	
-	RBTNode* del_node = FindNode(root, n);		// node to be deleted
+			
+	RBTNode* del_node = FindNode(root, n);				// node to be deleted
 	RBTNode* rep_node = new RBTNode;			// replacement node	
 	cout << "del node: " << RBTNodeToString(del_node) << endl;
 	
-	/* the deleted node either has one child or no child: 
-	 * one child: the replacement node becomes that child
-	 * no child: the replacement node can be any child since both children are nullptr/black
-	 */
+	/* the del_node either has one child or no child: 
+	 * one child: rep_node becomes that child -> replace the child with del_node
+	 * no child: rep_node can be any child since both children are null/black */
+	 
 	if (del_node->left == nullptr){					// deleted node has no left child
-		
 		rep_node = del_node->right;
-		cout << "rep node: " << RBTNodeToString(rep_node) << endl;
-		SwitchParent(del_node, rep_node);	
+		SwitchParent(del_node, rep_node);			// call the function to set del_node's parent to rep_node's parent
 		
 	} else if (del_node->right == nullptr){			// deleted node has no right child
 		rep_node = del_node->left;
-		cout << "rep node: " << RBTNodeToString(rep_node) << endl;
-		SwitchParent(del_node, rep_node);			
+		SwitchParent(del_node, rep_node);		
+			
+	} else {			// deleted node has 2 children
+		
+		RBTNode* successor = MinNode(del_node->right);		// delete the inorder successor node instead
+		cout << "actual del node: " << RBTNodeToString(successor) << endl;
+		rep_node = successor->right;
+		
+		if (successor->parent == del_node && rep_node != nullptr){
+			rep_node->parent = successor;
+			cout << "rep node" << endl;
+			
+		} else if (successor->parent != del_node){
+			
+			cout << "rep node: " << endl;
+			SwitchParent(successor, rep_node);
+			successor->right = del_node->right;
+			successor->right->parent = successor;
+		}
+		
+		SwitchParent(del_node, successor);
+		successor->left = del_node->left;			// the successor is always to the right -> always connect everything on the left
+		del_node->left->parent = successor;
+		successor->color = del_node->color;			// takes the color of the node being deleted
+		cout << "successor after: " << RBTNodeToString(successor) << endl;
 	}
-	
-	/*
-	if (rep_node == root || rep_node->color == COLOR_RED){
-		rep_node->color = COLOR_BLACK;
-	}
-	
 
-	if (rep_node->color == COLOR_BLACK || del_node->color == COLOR_BLACK){
-		//double black situation
+	if (rep_node == nullptr){
+		return;
+		
+	} else if (rep_node->color == COLOR_BLACK){
+			
 		rep_node->color = COLOR_DOUBLE_BLACK;
-		//fix double black
-	} */
-	
-	if (rep_node->color == COLOR_RED){			// should add rep_node == root as well?
+		FixDoubleBlack(rep_node);
+		cout << "fix double black " << endl;
+		
+	} else  {	// del_node is red & rep_node is red or null				
 		rep_node->color = COLOR_BLACK;	
 	}
 }
@@ -321,17 +429,7 @@ bool RedBlackTree::Contains(int n){
 
 
 int RedBlackTree::GetMin(){
-	RBTNode* tmp = root;
-	
-	if (tmp == nullptr){
-		throw invalid_argument("Tree is empty! There's no minimum value!");	
-	}
-	
-	while (tmp->left != nullptr){
-		tmp = tmp->left;
-	}
-	
-	return tmp->data;
+	return MinNode(root)->data;
 }
 
 

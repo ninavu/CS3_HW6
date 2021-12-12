@@ -36,13 +36,15 @@ class RedBlackTree {
 		string RBTNodeToString(RBTNode* n) const;
 
 		
-	private:
+	private: 
 		string ToInfixString(RBTNode* n) const;
 		string ToPrefixString(RBTNode* n) const;
 		string ToPostfixString(RBTNode* n) const;
 		
 		RBTNode* InsertNode(RBTNode* r, RBTNode* n);
 		RBTNode* FindNode(RBTNode* r, int n);
+		RBTNode* MinNode(RBTNode* snode);
+		
 		void SwitchParent(RBTNode* dnode, RBTNode* rnode);
 		void FixDoubleBlack(RBTNode* node);
 		
