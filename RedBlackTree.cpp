@@ -300,6 +300,8 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 				
 				if (sibling->left->color == COLOR_BLACK && sibling->right->color == COLOR_BLACK){
 					sibling->color = COLOR_RED;
+					cout << "sibling black children" << endl;
+					
 					
 					if (parent->color == COLOR_RED){
 						parent->color = COLOR_BLACK;
@@ -313,9 +315,11 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					if (sibling->right->color == COLOR_BLACK){	
 						sibling->left->color = COLOR_BLACK;
 						sibling->color = COLOR_RED;
-						RotateRight(sibling);
+						RotateRight(sibling);			
 						sibling = parent->right;
+						cout << "sibling black children"  << endl;
 					}
+					cout << "sibling red children" << endl;
 					sibling->color = parent->color;
 					sibling->right->color = COLOR_BLACK;			// since node is the left ch
 					parent->color = COLOR_BLACK;
@@ -380,7 +384,7 @@ void RedBlackTree::Remove(int n){
 			
 	RBTNode* del_node = FindNode(root, n);				// node to be deleted
 	int del_color = del_node->color;
-	RBTNode* rep_node = new RBTNode;			// replacement node	
+	RBTNode* rep_node;			// replacement node	
 	
 	cout << "del node: " << RBTNodeToString(del_node) << endl;
 	 
@@ -423,7 +427,6 @@ void RedBlackTree::Remove(int n){
 			successor->right->parent = successor;
 		}
 		
-		cout << "rep node null " << endl;
 		SwitchParent(del_node, successor);			// replace del_node with successor
 		successor->left = del_node->left;			// the successor is always to the right -> always connect everything on the left
 		del_node->left->parent = successor;
@@ -442,6 +445,10 @@ void RedBlackTree::Remove(int n){
 	} else {	// del_node is red & rep_node is red or null				
 		rep_node->color = COLOR_BLACK;	
 		cout << "fix color " << endl;
+	}
+	
+	if (rep_node->null == true){
+		rep_node = nullptr;
 	}
 }
 
