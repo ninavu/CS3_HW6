@@ -273,8 +273,9 @@ RBTNode* RedBlackTree::ConvertNull(RBTNode* node){
 
 
 void RedBlackTree::FixDoubleBlack(RBTNode* node){
-	cout << "node: " << RBTNodeToString(node) << endl;
+	
 	RBTNode* parent = node->parent;
+	cout << "node: " << RBTNodeToString(node) << endl;
 	cout << "parent: " << RBTNodeToString(parent) << endl;
 	
 	while (node != root && node->color == COLOR_DOUBLE_BLACK){
@@ -317,7 +318,6 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 						sibling->color = COLOR_RED;
 						RotateRight(sibling);			
 						sibling = parent->right;
-						cout << "sibling black children"  << endl;
 					}
 					cout << "sibling red children" << endl;
 					sibling->color = parent->color;
@@ -326,6 +326,14 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					RotateLeft(parent);
 					break;
 				}
+				
+				if (sibling->left->null == true){
+					sibling->left = nullptr;
+				} 
+				
+				if (sibling->right->null == true){
+					sibling->right = nullptr;
+				} 
 			}
 			
 		} else if (node == node->parent->right){
@@ -372,6 +380,14 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					RotateRight(parent);
 					break;
 				}
+				
+				if (sibling->left->null == true){
+					sibling->left = nullptr;
+				} 
+				
+				if (sibling->right->null == true){
+					sibling->right = nullptr;
+				} 
 			}	
 		}
 	}
