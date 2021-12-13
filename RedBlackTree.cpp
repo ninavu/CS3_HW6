@@ -271,7 +271,7 @@ RBTNode* RedBlackTree::ConvertNull(RBTNode* node){
 	return node;
 }
 
-
+/* //Delete all the null nodes - segmentation fault
 void RedBlackTree::DeleteNull(RBTNode* r){
 	
 	RBTNode* tmp = r;
@@ -279,7 +279,7 @@ void RedBlackTree::DeleteNull(RBTNode* r){
 	if (tmp != nullptr){
 		
 		if (tmp->left != nullptr){
-			DeleteNull(tmp->left);
+			DeleteNull(tmp->left);		
 		} 
 		
 		if (tmp->right != nullptr){
@@ -287,11 +287,17 @@ void RedBlackTree::DeleteNull(RBTNode* r){
 		}
 		
 		if (tmp->null == true){
-			tmp = nullptr;
+			
+			tmp = tmp->parent;
+			if (tmp->left->null == true){
+				tmp->left = nullptr;
+			} else if (tmp->right->null == true){
+				tmp->right = nullptr;
+			}
 		}
 	}	
 }
-
+*/
 
 void RedBlackTree::FixDoubleBlack(RBTNode* node){
 	
@@ -468,7 +474,7 @@ void RedBlackTree::Remove(int n){
 		//cout << "fix color " << endl;
 	}
 	
-	DeleteNull(root);
+	//DeleteNull(root);
 }
 
 

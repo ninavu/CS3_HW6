@@ -47,7 +47,7 @@ class RedBlackTree {
 		RBTNode* MinNode(RBTNode* snode);
 		
 		RBTNode* ConvertNull(RBTNode* null);
-		void DeleteNull(RBTNode* null);
+		//void DeleteNull(RBTNode* null);
 		
 		void SwitchParent(RBTNode* dnode, RBTNode* rnode);
 		void FixDoubleBlack(RBTNode* node);
