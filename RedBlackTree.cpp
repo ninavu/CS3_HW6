@@ -156,10 +156,9 @@ void RedBlackTree::Insert(int n){
 	while (node != root && node->parent->color == COLOR_RED){		// make sure node is not the root to avoid segmentation fault
 		RBTNode* parent = node->parent;
 		RBTNode* grandparent = parent->parent;
-		RBTNode* uncle = new RBTNode;
 		
 		if (parent == grandparent->left){				// set uncle depends on the parent's position
-			uncle = grandparent->right;
+			RBTNode* uncle = grandparent->right;
 
 			if (uncle == nullptr || uncle->color == COLOR_BLACK) {		// rotate and recolor when uncle is black
 				if (node == parent->right){
@@ -182,7 +181,7 @@ void RedBlackTree::Insert(int n){
 			}
 			
 		} else if (parent == grandparent->right) {		// mirror case
-			uncle = grandparent->left;
+			RBTNode* uncle = grandparent->left;
 			
 			if (uncle == nullptr || uncle->color == COLOR_BLACK) {
 				if (node == parent->left){
@@ -275,14 +274,13 @@ RBTNode* RedBlackTree::ConvertNull(RBTNode* node){
 
 void RedBlackTree::FixDoubleBlack(RBTNode* node){
 	cout << "node: " << RBTNodeToString(node) << endl;
-	RBTNode* sibling = new RBTNode;
 	RBTNode* parent = node->parent;
 	cout << "parent: " << RBTNodeToString(parent) << endl;
 	
 	while (node != root && node->color == COLOR_DOUBLE_BLACK){
 		
 		if (node == parent->left){
-			sibling = parent->right;
+			RBTNode* sibling = parent->right;
 			cout << "sibling right: " << RBTNodeToString(sibling) << endl;
 			
 			if (sibling->color == COLOR_RED){
@@ -327,7 +325,7 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 			}
 			
 		} else if (node == node->parent->right){
-			sibling = node->parent->left;
+			RBTNode* sibling = node->parent->left;
 			cout << "sibling left: " << RBTNodeToString(sibling) << endl;
 			
 			if (sibling->color == COLOR_RED){
@@ -591,6 +589,8 @@ void RedBlackTree::DeleteNode(RBTNode* node){
 	}
 }
 
+// node struct: make an id number, a global variable each 
+// assign id number, print it, print the id number deleting
 
 RedBlackTree::~RedBlackTree(){
 	DeleteNode(root);

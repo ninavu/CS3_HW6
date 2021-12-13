@@ -604,6 +604,35 @@ void TestRemoveLeaf(){
 	cout << "PASSED!" << endl << endl;
 }
 
+
+void TestRemoveRandomTests(){
+	cout << "Random Remove Tests..." << endl;
+	RedBlackTree *rbt = new RedBlackTree();
+	rbt->Insert(3);
+	rbt->Insert(8);
+	rbt->Insert(4);
+	rbt->Insert(15);
+	rbt->Insert(35);
+	rbt->Insert(25);
+	rbt->Insert(40);
+	rbt->Insert(13);
+	rbt->Insert(30);
+	rbt->Insert(17);
+	rbt->Insert(1);
+	rbt->Insert(11);
+	rbt->Insert(12);
+	rbt->Insert(7);
+	rbt->Insert(6);
+	rbt->Insert(22);
+	rbt->Insert(27);
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B15  B4  B3  R1  R11  B7  R6  R8  B13  R12  B35  R25  B17  R22  B30  R27  B40 ");
+	
+	delete rbt;
+	
+	cout << "PASSED!" << endl << endl;
+}
+
 void TestContains(){
 	cout << "Testing Contains..." << endl;
 	RedBlackTree *rbt = new RedBlackTree();
@@ -688,7 +717,7 @@ int main(){
 	TestRemoveTwoChildren();
 	TestRemoveLeaf();
 	
-	//TestRemoveRandomTests();
+	TestRemoveRandomTests();
 
 	TestContains();
 	TestGetMinimumMaximum();
