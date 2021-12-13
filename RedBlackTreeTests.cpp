@@ -466,16 +466,13 @@ void TestRemoveTwoChildren(){
 	rbt->Insert(13);
 	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R12  B11  B14  R13  B19 ");
 
-	rbt->Remove(12);		// delete red, replacement red
-	cout << "rbt: " << rbt->ToPrefixString() << endl;	
+	rbt->Remove(12);		// delete red, replacement red	
 	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R13  B11  B14  B19 ");
 	
 	rbt->Insert(16);
 	rbt->Insert(25);
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
 	
 	rbt->Remove(19);		// delete black, replacement red
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R13  B11  B14  B25  R16 ");
 	
 	delete rbt;
@@ -499,7 +496,7 @@ void TestRemoveTwoChildren(){
 	assert(rbt->ToPrefixString() == " B10  R5  B1  R3  B7  R25  B15  R22  B27 ");
 	
 	rbt->Remove(5);		// delete red, replacement black, black sibling, 2 rotations left right
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B10  R3  B1  B7  R25  B15  R22  B27 ");
 	
 	delete rbt;
@@ -514,15 +511,14 @@ void TestRemoveTwoChildren(){
 	rbt->Insert(8);
 	rbt->Insert(11);
 	rbt->Insert(26);  
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B7  B3  R18  B10  R8  R11  B22  R26 ");
 	
 	rbt->Remove(18);		// delete red, replacement black 
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B7  B3  R22  B10  R8  R11  B26 ");
 	
 	rbt->Remove(22);		// delete red, replacement black, black sibling has red children
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B7  B3  R10  B8  B26  R11 ");
 
 	delete rbt;
@@ -550,7 +546,6 @@ void TestRemoveLeaf(){
 	rbt->Insert(35);
 	rbt->Insert(25);
 	rbt->Insert(40);
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B10  R7  B3  R4  B8  R20  B15  B35  R25  R40 ");
 	
 	rbt->Remove(4);			// delete another red node 
@@ -579,7 +574,7 @@ void TestRemoveLeaf(){
 	assert(rbt->ToPrefixString() == " B7  B3  R18  B10  R8  R11  B22  R26 ");
 	
 	rbt->Remove(3);		// delete black node, red sibling
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B18  R10  B7  R8  B11  B22  R26 ");
 	
 	delete rbt;
@@ -639,7 +634,7 @@ void TestRemoveRandomTests(){
 	assert(rbt->ToPrefixString() == " B15  B4  B3  R1  R7  B6  B11  R8  B35  R25  B17  R22  B27  B40 ");
 	
 	rbt->Remove(35);			// remove 2 children, red sibling -> black sibling w/ black children
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B15  B4  B3  R1  R7  B6  B11  R8  B25  B17  R22  B40  R27 ");
 	
 	rbt->Remove(15);			// remove root with 2 children, replacement red
@@ -647,7 +642,7 @@ void TestRemoveRandomTests(){
 	assert(rbt->ToPrefixString() == " B17  B4  B3  R1  R7  B6  B11  R8  B25  B22  B40  R27 ");
 	
 	rbt->Remove(6);				// remove black leaf -> double black
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B17  B4  B3  R1  R8  B7  B11  B25  B22  B40  R27 ");
 	
 	

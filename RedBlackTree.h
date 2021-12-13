@@ -45,7 +45,9 @@ class RedBlackTree {
 		RBTNode* InsertNode(RBTNode* r, RBTNode* n);
 		RBTNode* FindNode(RBTNode* r, int n);
 		RBTNode* MinNode(RBTNode* snode);
+		
 		RBTNode* ConvertNull(RBTNode* null);
+		void DeleteNull(RBTNode* null);
 		
 		void SwitchParent(RBTNode* dnode, RBTNode* rnode);
 		void FixDoubleBlack(RBTNode* node);
