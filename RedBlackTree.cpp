@@ -141,7 +141,7 @@ RBTNode* RedBlackTree::InsertNode(RBTNode* r, RBTNode* node){
 	return r;
 } 
 
-
+/* Insert function takes roughly 1-2 seconds to process */
 void RedBlackTree::Insert(int n){
 	if (Contains(n)){						// BST doesn't allow duplicate numbers
 		throw invalid_argument("Node already exists in the tree!");	
@@ -326,14 +326,6 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					RotateLeft(parent);
 					break;
 				}
-				
-				if (sibling->left->null == true){
-					sibling->left = nullptr;
-				} 
-				
-				if (sibling->right->null == true){
-					sibling->right = nullptr;
-				} 
 			}
 			
 		} else if (node == node->parent->right){
@@ -380,14 +372,6 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					RotateRight(parent);
 					break;
 				}
-				
-				if (sibling->left->null == true){
-					sibling->left = nullptr;
-				} 
-				
-				if (sibling->right->null == true){
-					sibling->right = nullptr;
-				} 
 			}	
 		}
 	}
@@ -395,7 +379,7 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 	node->color = COLOR_BLACK;		// eject double-blackness out of root node
 }
 
-
+/* Remove function takes roughly 1-2 seconds to process */
 void RedBlackTree::Remove(int n){
 			
 	RBTNode* del_node = FindNode(root, n);				// node to be deleted
@@ -463,9 +447,10 @@ void RedBlackTree::Remove(int n){
 		cout << "fix color " << endl;
 	}
 	
+	/*
 	if (rep_node->null == true){
 		rep_node = nullptr;
-	}
+	} */
 }
 
 
