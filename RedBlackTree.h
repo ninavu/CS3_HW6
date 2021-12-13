@@ -14,16 +14,17 @@ struct RBTNode {
 	RBTNode* parent = nullptr;
 	RBTNode* right = nullptr;
 	RBTNode* left = nullptr;		// null nodes are black
+	bool null = false;
 };
 
 class RedBlackTree {
 	public:
 		RedBlackTree();  	//simple constructor
 		RedBlackTree(const RedBlackTree& rbt);			//copy constructor
-		~RedBlackTree();	// incomplete destructor
+		~RedBlackTree();	//destructor
 		
 		void Insert(int num);
-		void Remove(int data);
+		void Remove(int num);
 		bool Contains(int num);
 		
 		int GetMin();
@@ -44,6 +45,7 @@ class RedBlackTree {
 		RBTNode* InsertNode(RBTNode* r, RBTNode* n);
 		RBTNode* FindNode(RBTNode* r, int n);
 		RBTNode* MinNode(RBTNode* snode);
+		RBTNode* ConvertNull(RBTNode* null);
 		
 		void SwitchParent(RBTNode* dnode, RBTNode* rnode);
 		void FixDoubleBlack(RBTNode* node);

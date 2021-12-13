@@ -208,11 +208,7 @@ void RedBlackTree::Insert(int n){
 	numItems++;
 }
 
-/* Remove BST: 
- * 0 child -> just get rid of it
- * 2 child -> recursion: in order successor (right, all the way to the left) : replace the data with the root
- */
- 
+
 /* A private helper function that finds the nodes in the tree 
  * in the right position */
 RBTNode* RedBlackTree::FindNode(RBTNode* r, int n){
@@ -223,19 +219,17 @@ RBTNode* RedBlackTree::FindNode(RBTNode* r, int n){
 	
 	RBTNode* tmp = r;
 	
-	while (tmp != nullptr){
-		if (tmp->data == n){
-			return tmp;
-			
-		} else if (tmp->data > n){
+	while (tmp->data != n){
+		if (tmp->data > n){
 			tmp = tmp->left;
 			
 		} else {
 			tmp = tmp->right;
 		}
 	}
-	return nullptr;
+	return tmp;
 }
+
 
 RBTNode* RedBlackTree::MinNode(RBTNode* snode){
 	
@@ -269,15 +263,27 @@ void RedBlackTree::SwitchParent(RBTNode* dnode, RBTNode* rnode){
 }
 
 
-void RedBlackTree::FixDoubleBlack(RBTNode* node){
+RBTNode* RedBlackTree::ConvertNull(RBTNode* node){
 	
+	RBTNode* tmp = new RBTNode;
+	node = tmp;
+	node->null = true;
+	node->color = COLOR_BLACK;
+	return node;
+}
+
+
+void RedBlackTree::FixDoubleBlack(RBTNode* node){
+	cout << "node: " << RBTNodeToString(node) << endl;
 	RBTNode* sibling = new RBTNode;
 	RBTNode* parent = node->parent;
+	cout << "parent: " << RBTNodeToString(parent) << endl;
 	
 	while (node != root && node->color == COLOR_DOUBLE_BLACK){
 		
 		if (node == parent->left){
 			sibling = parent->right;
+			cout << "sibling right: " << RBTNodeToString(sibling) << endl;
 			
 			if (sibling->color == COLOR_RED){
 				parent->color = COLOR_RED;
@@ -286,6 +292,14 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 				
 			} else if (sibling->color == COLOR_BLACK){
 				
+				if (sibling->left == nullptr){
+					sibling->left = ConvertNull(sibling->left);
+				}
+				
+				if (sibling->right == nullptr){
+					sibling->right = ConvertNull(sibling->right);
+				}
+				
 				if (sibling->left->color == COLOR_BLACK && sibling->right->color == COLOR_BLACK){
 					sibling->color = COLOR_RED;
 					
@@ -298,21 +312,23 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					
 				} else {
 					
-					if (sibling->right == nullptr || sibling->right->color == COLOR_BLACK){	
-						RotateRight(sibling);
+					if (sibling->right->color == COLOR_BLACK){	
 						sibling->left->color = COLOR_BLACK;
 						sibling->color = COLOR_RED;
+						RotateRight(sibling);
 						sibling = parent->right;
 					}
-					RotateLeft(parent);
 					sibling->color = parent->color;
-					sibling->right->color = COLOR_BLACK;
+					sibling->right->color = COLOR_BLACK;			// since node is the left ch
 					parent->color = COLOR_BLACK;
+					RotateLeft(parent);
+					break;
 				}
 			}
 			
 		} else if (node == node->parent->right){
 			sibling = node->parent->left;
+			cout << "sibling left: " << RBTNodeToString(sibling) << endl;
 			
 			if (sibling->color == COLOR_RED){
 				parent->color = COLOR_RED;
@@ -321,8 +337,17 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 				
 			} else if (sibling->color == COLOR_BLACK){
 				
+				if (sibling->left == nullptr){
+					sibling->left = ConvertNull(sibling->left);
+				}
+				
+				if (sibling->right == nullptr){
+					sibling->right = ConvertNull(sibling->right);
+				}
+				
 				if (sibling->left->color == COLOR_BLACK && sibling->right->color == COLOR_BLACK){
 					sibling->color = COLOR_RED;
+					cout << "sibling black children" << endl;
 					
 					if (parent->color == COLOR_RED){
 						parent->color = COLOR_BLACK;
@@ -332,17 +357,18 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 					node = parent;					// move the double black up to the parent
 					
 				} else {
-					
-					if (sibling->left == nullptr || sibling->left->color == COLOR_BLACK){
-						RotateLeft(sibling);
-						sibling->left->color = COLOR_BLACK;
+			
+					if (sibling->left->color == COLOR_BLACK){
+						sibling->right->color = COLOR_BLACK;
 						sibling->color = COLOR_RED;
-						sibling = parent->right;
+						RotateLeft(sibling);
+						sibling = parent->left;		// since node is the right child
 					}
-					RotateRight(parent);
 					sibling->color = parent->color;
-					sibling->right->color = COLOR_BLACK;
 					parent->color = COLOR_BLACK;
+					sibling->left->color = COLOR_BLACK;
+					RotateRight(parent);
+					break;
 				}
 			}	
 		}
@@ -355,15 +381,20 @@ void RedBlackTree::FixDoubleBlack(RBTNode* node){
 void RedBlackTree::Remove(int n){
 			
 	RBTNode* del_node = FindNode(root, n);				// node to be deleted
+	int del_color = del_node->color;
 	RBTNode* rep_node = new RBTNode;			// replacement node	
-	cout << "del node: " << RBTNodeToString(del_node) << endl;
 	
-	/* the del_node either has one child or no child: 
-	 * one child: rep_node becomes that child -> replace the child with del_node
-	 * no child: rep_node can be any child since both children are null/black */
+	cout << "del node: " << RBTNodeToString(del_node) << endl;
 	 
-	if (del_node->left == nullptr){					// deleted node has no left child
+	if (del_node->left == nullptr){					// deleted node has no left child or no child 
+		
 		rep_node = del_node->right;
+
+		if (del_color == COLOR_BLACK && rep_node == nullptr){
+			rep_node = ConvertNull(rep_node);
+			rep_node->parent = del_node->parent;
+		}
+		
 		SwitchParent(del_node, rep_node);			// call the function to set del_node's parent to rep_node's parent
 		
 	} else if (del_node->right == nullptr){			// deleted node has no right child
@@ -373,39 +404,46 @@ void RedBlackTree::Remove(int n){
 	} else {			// deleted node has 2 children
 		
 		RBTNode* successor = MinNode(del_node->right);		// delete the inorder successor node instead
-		cout << "actual del node: " << RBTNodeToString(successor) << endl;
 		rep_node = successor->right;
+		del_color = successor->color;
+		cout << "actual del node: " << RBTNodeToString(successor) << endl;
+		
+		if (successor->color == COLOR_BLACK && rep_node == nullptr){
+			rep_node = ConvertNull(rep_node);
+			successor->right = rep_node;
+		}			
 		
 		if (successor->parent == del_node && rep_node != nullptr){
 			rep_node->parent = successor;
-			cout << "rep node" << endl;
+			cout << "rep node 1" << RBTNodeToString(rep_node) << endl;
 			
 		} else if (successor->parent != del_node){
 			
-			cout << "rep node: " << endl;
-			SwitchParent(successor, rep_node);
-			successor->right = del_node->right;
+			cout << "rep node 2 " << endl;
+			SwitchParent(successor, rep_node);			// move rep_node into the successor place
+			successor->right = del_node->right;		
 			successor->right->parent = successor;
 		}
 		
-		SwitchParent(del_node, successor);
+		cout << "rep node null " << endl;
+		SwitchParent(del_node, successor);			// replace del_node with successor
 		successor->left = del_node->left;			// the successor is always to the right -> always connect everything on the left
 		del_node->left->parent = successor;
 		successor->color = del_node->color;			// takes the color of the node being deleted
 		cout << "successor after: " << RBTNodeToString(successor) << endl;
 	}
 
-	if (rep_node == nullptr){
+	if (del_color == COLOR_BLACK && rep_node->color == COLOR_BLACK){
+		rep_node->color = COLOR_DOUBLE_BLACK;	
+		cout << "fix double black " << endl;
+		FixDoubleBlack(rep_node);
+		
+	} else if (rep_node == nullptr) {
 		return;
 		
-	} else if (rep_node->color == COLOR_BLACK){
-			
-		rep_node->color = COLOR_DOUBLE_BLACK;
-		FixDoubleBlack(rep_node);
-		cout << "fix double black " << endl;
-		
-	} else  {	// del_node is red & rep_node is red or null				
+	} else {	// del_node is red & rep_node is red or null				
 		rep_node->color = COLOR_BLACK;	
+		cout << "fix color " << endl;
 	}
 }
 
@@ -454,12 +492,19 @@ int RedBlackTree::Size(){
 
 
 string RedBlackTree::RBTNodeToString(RBTNode* node) const{
+	
+	if (node->null == true){
+		return "";
+	}
+	
 	string s = " ";
 	
 	if (node->color == COLOR_RED){
 		s += "R";
 	} else if (node->color == COLOR_BLACK){
 		s += "B"; 
+	} else {
+		s+= "DB";
 	}
 		
 	s += to_string(node->data);
@@ -529,7 +574,7 @@ string RedBlackTree::ToPostfixString(RBTNode* node) const{
 
 
 /* A private destructor helper function that recursively calls itself 
- * to delete all the nodes - NOT COMPLETE */
+ * to delete all the nodes */
 void RedBlackTree::DeleteNode(RBTNode* node){
 		
 	if (node != nullptr){

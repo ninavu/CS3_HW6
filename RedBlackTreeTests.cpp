@@ -452,7 +452,7 @@ void TestRemoveTwoChildren(){
 	rbt->Insert(10);
 	
 	rbt->Remove(14);
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
 	assert(rbt->ToPrefixString() == " B19  R10 ");
 
 	rbt->Insert(5);
@@ -462,53 +462,69 @@ void TestRemoveTwoChildren(){
 	rbt->Insert(15);
 	rbt->Insert(12);
 	rbt->Insert(11);
-	rbt->Insert(13);
 	rbt->Insert(14);
-	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R12  B11  B13  R14  B19 ");
+	rbt->Insert(13);
+	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R12  B11  B14  R13  B19 ");
 
-	rbt->Remove(12);		// delete red, replacement black
-	//cout << "rbt: " << rbt->ToPrefixString() << endl;	
+	rbt->Remove(12);		// delete red, replacement red
+	cout << "rbt: " << rbt->ToPrefixString() << endl;	
 	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R13  B11  B14  B19 ");
 	
-	rbt->Remove(5);			// delete black, replacement
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
-	assert(rbt->ToPrefixString() == " B10  B7  B3  B9  B15  R13  B11  B14  B19 ");
-	
-	rbt->Remove(15);		// left right case
-	cout << "rbt: " << rbt->ToPrefixString() << endl;
-	assert(rbt->ToPrefixString() == " B9  R5  B3  B6  B11 ");
-	
-	rbt->Insert(0);
 	rbt->Insert(16);
-	rbt->Remove(3);		// left left case
-	assert(rbt->ToPrefixString() == " B9  R5  B0  B6  B11  R16 ");
+	rbt->Insert(25);
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
 	
-	rbt->Remove(11);	// right right case
-	//cout << "rbt: " << rbt->ToPrefixString() << endl;
-	assert(rbt->ToPrefixString() == " B9  R5  B0  B6  B16 ");
-
+	rbt->Remove(19);		// delete black, replacement red
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  B5  B3  B9  R7  B15  R13  B11  B14  B25  R16 ");
+	
 	delete rbt;
-
-	cout << "PASSED!" << endl << endl;
-}
-
-void TestRemoveDoubleBlack(){
-	cout << "Testing Remove (Double Black Condition)..." << endl;
-	RedBlackTree *rbt = new RedBlackTree();
-	rbt->Insert(40);
-	rbt->Insert(22);
-	rbt->Insert(15);
-	rbt->Insert(31);
-	rbt->Insert(55);
-	rbt->Insert(12);
-	rbt->Insert(17);
-	rbt->Insert(29);
-	rbt->Insert(34);
 	
-	assert(rbt->Contains(34));
-	assert(rbt->Contains(35) == false);
-	assert(rbt->Contains(22));
-	assert(rbt->Contains(28) == false);
+	
+	rbt = new RedBlackTree();
+	rbt->Insert(9);
+	rbt->Insert(5);
+	rbt->Insert(15);
+	rbt->Insert(1);
+	rbt->Insert(7);
+	rbt->Insert(3);
+	rbt->Insert(10);
+	rbt->Insert(25);
+	rbt->Insert(22);
+	rbt->Insert(27);
+	assert(rbt->ToPrefixString() == " B9  R5  B1  R3  B7  R15  B10  B25  R22  R27 ");
+	
+	rbt->Remove(9);		// delete black, replacement black, black sibling has red children, 1 rotation
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R5  B1  R3  B7  R25  B15  R22  B27 ");
+	
+	rbt->Remove(5);		// delete red, replacement black, black sibling, 2 rotations left right
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R3  B1  B7  R25  B15  R22  B27 ");
+	
+	delete rbt;
+	
+	
+	rbt = new RedBlackTree();
+	rbt->Insert(7);
+	rbt->Insert(3);
+	rbt->Insert(18);
+	rbt->Insert(10);
+	rbt->Insert(22);
+	rbt->Insert(8);
+	rbt->Insert(11);
+	rbt->Insert(26);  
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B7  B3  R18  B10  R8  R11  B22  R26 ");
+	
+	rbt->Remove(18);		// delete red, replacement black 
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B7  B3  R22  B10  R8  R11  B26 ");
+	
+	rbt->Remove(22);		// delete red, replacement black, black sibling has red children
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B7  B3  R10  B8  B26  R11 ");
+
 	delete rbt;
 
 	cout << "PASSED!" << endl << endl;
@@ -518,34 +534,72 @@ void TestRemoveDoubleBlack(){
 void TestRemoveLeaf(){
 	cout << "Testing Remove Leaf..." << endl;
 	RedBlackTree *rbt = new RedBlackTree();
-	rbt->Insert(14);
-	rbt->Insert(9);
-	rbt->Insert(5);
-	rbt->Insert(11);
-	rbt->Insert(2);
+	rbt->Insert(10);
 	rbt->Insert(7);
-	rbt->Insert(6);
-	assert(rbt->ToPrefixString() == " B2  R5  R6  B7  B9  R11  B14 ");
+	rbt->Insert(20);
+	rbt->Insert(30);
+	assert(rbt->ToPrefixString() == " B10  B7  B20  R30 ");
 	
-	rbt->Remove(11);
-	assert(rbt->ToPrefixString() == " B2  R5  R6  B7  B9  B14 ");
+	rbt->Remove(30);		// just delete the red node
+	assert(rbt->ToPrefixString() == " B10  B7  B20 ");
 	
-	rbt->Remove(6);
-	assert(rbt->ToPrefixString() == " B2  R5  B7  B9  B14 ");
+	rbt->Insert(3);
+	rbt->Insert(8);
+	rbt->Insert(4);
+	rbt->Insert(15);
+	rbt->Insert(35);
+	rbt->Insert(25);
+	rbt->Insert(40);
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R7  B3  R4  B8  R20  B15  B35  R25  R40 ");
 	
-	rbt->Remove(2);
-	assert(rbt->ToPrefixString() == " B5  R7  B9  B14 ");
+	rbt->Remove(4);			// delete another red node 
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R7  B3  B8  R20  B15  B35  R25  R40 ");
 	
-	rbt->Remove(7);
-	assert(rbt->ToPrefixString() == " B5  R7  B9  B14 ");
+	rbt->Remove(15);		// delete black node, black sibling with red children
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R7  B3  B8  R35  B20  R25  B40 ");
 	
-	rbt->Remove(5);
-	assert(rbt->ToPrefixString() == " B30 ");
-	
-	rbt->Remove(9);
-	assert(rbt->ToPrefixString() == " B30 ");
+	rbt->Remove(40);		// delete black node, black sibling with red children, rotate left right
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B10  R7  B3  B8  R25  B20  B35 ");
 
 	delete rbt;
+	
+	rbt = new RedBlackTree();
+	rbt->Insert(7);
+	rbt->Insert(3);
+	rbt->Insert(18);
+	rbt->Insert(10);
+	rbt->Insert(22);
+	rbt->Insert(8);
+	rbt->Insert(11);
+	rbt->Insert(26);
+	assert(rbt->ToPrefixString() == " B7  B3  R18  B10  R8  R11  B22  R26 ");
+	
+	rbt->Remove(3);		// delete black node, red sibling
+	cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B18  R10  B7  R8  B11  B22  R26 ");
+	
+	delete rbt;
+	
+	rbt = new RedBlackTree();
+	rbt->Insert(13);
+	rbt->Insert(8);
+	rbt->Insert(17);
+	rbt->Insert(1);
+	rbt->Insert(11);
+	rbt->Insert(15);
+	rbt->Insert(25);
+	rbt->Insert(6);
+	rbt->Insert(22);
+	rbt->Insert(27);
+	assert(rbt->ToPrefixString() == " B13  R8  B1  R6  B11  R17  B15  B25  R22  R27 ");
+	
+	rbt->Remove(11);		// delete black node, red sibling, 2 rotations left right
+	//cout << "rbt: " << rbt->ToPrefixString() << endl;
+	assert(rbt->ToPrefixString() == " B13  R6  B1  B8  R17  B15  B25  R22  R27 ");
 
 	cout << "PASSED!" << endl << endl;
 }
@@ -632,8 +686,9 @@ int main(){
 	
 	TestRemoveOneChild();
 	TestRemoveTwoChildren();
-	TestRemoveDoubleBlack();
 	TestRemoveLeaf();
+	
+	//TestRemoveRandomTests();
 
 	TestContains();
 	TestGetMinimumMaximum();
